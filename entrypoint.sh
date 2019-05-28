@@ -35,7 +35,7 @@ module load intel-mkl/2018.1.163
 echo "Run directory: $SLURM_SUBMIT_DIR"
 cd $SLURM_SUBMIT_DIR
 
-mpirun -np 40 $VASP
+mpirun -np 40 $SLURM_SUBMIT_DIR/$VASP
 EOF
 
 # Mak sure script is executable
