@@ -24,4 +24,3 @@ The container expects some externally mounted volumes to provide information
 | `/ssh`       | Should mount the users private RSA key for password-less login |
 
 > The container expects the private key to reside in `/ssh/id_rsa` with appropriate permissions.
-
