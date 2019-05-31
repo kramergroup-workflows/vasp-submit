@@ -59,7 +59,7 @@ ENV JOB_EMAIL "noreply@nowhere.com"
 
 RUN apk --no-cache add openssh-client bash gettext
 COPY --from=s3 bin/* /assets/
-COPY --from=casm /src/dist/vasp-driver*.zip /assets/vasp_driver.pyx
+COPY --from=py /src/dist/vasp-driver*.zip /assets/vasp-driver.pyx
 
 COPY entrypoint.sh /entrypoint.sh
 
