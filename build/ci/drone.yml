@@ -11,6 +11,7 @@ steps:
     password: 
       from_secret: docker-hub-password
     repo: registry.kramergroup.science/workflows/submit-vasp-to-iridis5
+    dockerfile: build/docker/Dockerfile
     build_args:
       from_secret: build-args
       # build-args should be a komma-separated string:
