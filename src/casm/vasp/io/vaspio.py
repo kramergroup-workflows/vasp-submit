@@ -1,8 +1,8 @@
 from __future__ import (absolute_import, division, print_function, unicode_literals)
 from builtins import *
 
-import numpy as np
-from casm.vasp.io import poscar, kpoints, species, incar
+from casm.vasp.io import poscar, kpoints, species, incar, VaspIOError
+import os
 
 class VaspIO:
     """ Generate a set of VASP input files from settings files
@@ -34,7 +34,7 @@ class VaspIO:
         self.poscar = poscar.Poscar(super_poscarfile, self.species)
         self.incar = incar.Incar(incarfile, self.species, self.poscar, sort)
         self.kpoints = prim_kpoints.super_kpoints(prim, self.poscar)
-    
+        self.sort = sort
 
     def write_potcar(self, filename, sort=False):
         """ Write an appropriate POTCAR """
@@ -87,7 +87,7 @@ class VaspIO:
                             alias[k].append(atom.occupant)
                 
                 # list of IndividualSpecies names
-                specie = [species[x].name for x in self.species]
+                specie = [self.species[x].name for x in self.species]
                 
                 # list of potcardir
                 potcar_list = []

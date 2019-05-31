@@ -19,6 +19,7 @@ from casm.vasp.run import \
     run
 from casm.vasp.relax import Relax
 from casm.vasp.converge import Converge
+
 __all__ = [
     'io',
     'VaspError',

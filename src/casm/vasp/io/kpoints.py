@@ -1,7 +1,6 @@
 from __future__ import (absolute_import, division, print_function, unicode_literals)
 from builtins import *
 
-import numpy as np
 import math
 import copy
 
@@ -35,7 +34,7 @@ class Kpoints:
         try:
             file = open(filename)
         except IOError:
-            raise KpointsError('IOError',filename)
+            raise KpointsError(filename)
             
         # read header
         self.header = file.readline().strip()

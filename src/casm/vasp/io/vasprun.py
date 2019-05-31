@@ -3,7 +3,6 @@ from builtins import *
 
 import xml.etree.cElementTree as etree
 import os, gzip
-import numpy as np
 
 class VasprunError(Exception):
     def __init__(self,msg):
@@ -65,7 +64,7 @@ class Vasprun:
         self.coord_mode = 'direct'
 
         # did the VASP calculation run to completion?
-        self.is_complete = False
+        self._is_complete = False
 
         # Is DOS present?
         self.DOS = DOS                # Whether to even read DOS; grabbed from init args
@@ -91,7 +90,7 @@ class Vasprun:
 
     def is_complete(self):
         """ Return True if VASP calculation ran to completion """
-        return self.is_complete
+        return self._is_complete
 
     def iter_read(self):
         """ Create a Vasprun object from a vasprun.xml file with name 'filename' """
@@ -161,12 +160,16 @@ class Vasprun:
                                     points = len(total.find('set').findall('set')[0].findall('r'))
                                     fields = len(total.findall('field'))
 
-                                    total_array = np.zeros([spins, points, fields])
+                                    # total_array = np.zeros([spins, points, fields])
+                                    total_array = [[0.0 for i in range(spins)],
+                                                   [0.0 for i in range(points)],
+                                                   [0.0 for i in range(fields)]  
+                                                  ]
 
                                     for s in range(spins):
                                         my_set = total.find('set').findall('set')[s].findall('r')
                                         for r in range(points):
-                                             total_array[s,r] = map(float, my_set[r].text.split())
+                                             total_array[s][r] = map(float, my_set[r].text.split())
 
                                     self.dos = total_array
 
@@ -183,28 +186,36 @@ class Vasprun:
                                         points = len(partial.find('set').findall('set')[0].findall('set')[0].findall('r'))
                                         fields = len(partial.findall('field'))
 
-                                        partial_array = np.zeros([ions, spins, points, fields])
+                                        # partial_array = np.zeros([ions, spins, points, fields])
+                                        partial_array = [
+                                            [0.0 for i in range(ions)],
+                                            [0.0 for i in range(spins)],
+                                            [0.0 for i in range(points)],
+                                            [0.0 for i in range(fields)]
+                                        ] 
 
                                         for i in range(ions):
                                             i_set = partial.find('set').findall('set')[i].findall('set')
                                             for s in range(spins):
                                                 my_set = i_set[s].findall('r')
                                                 for r in range(points):
-                                                     partial_array[i,s,r] = map(float, my_set[r].text.split())
+                                                     partial_array[i][s][r] = map(float, my_set[r].text.split())
 
                                         self.dos_lm = partial_array
 
                         if self.Band:
-                                eig_parse_vals = elem.find('eigenvalues').find('array').find('set')
-                                num_kpoints = len(eig_parse_vals.find('set').findall('set'))
-                                num_bands = len(eig_parse_vals.find('set').find('set').findall('r'))
-                                self.eigenvalues = [np.empty([num_kpoints,num_bands]),np.empty([num_kpoints,num_bands])]
-                                for spin_ctr,spin in enumerate(eig_parse_vals):
-                                    for kpoint_ctr,kpoint in enumerate(spin):
-                                        for band_ctr,band in enumerate(kpoint):
-                                            self.eigenvalues[spin_ctr][kpoint_ctr,band_ctr] = band.text.strip().split()[0]
-                                eig_parse_vals.clear()
+                                # eig_parse_vals = elem.find('eigenvalues').find('array').find('set')
+                                # num_kpoints = len(eig_parse_vals.find('set').findall('set'))
+                                # num_bands = len(eig_parse_vals.find('set').find('set').findall('r'))
+                                # self.eigenvalues = [np.empty([num_kpoints,num_bands]),np.empty([num_kpoints,num_bands])]
 
+                                # for spin_ctr,spin in enumerate(eig_parse_vals):
+                                #     for kpoint_ctr,kpoint in enumerate(spin):
+                                #         for band_ctr,band in enumerate(kpoint):
+                                #             self.eigenvalues[spin_ctr][kpoint_ctr,band_ctr] = band.text.strip().split()[0]
+                                # eig_parse_vals.clear()
+                                raise Exception("Eingenvalue parsing not implemented.")
+                                
                 elif elem.tag == 'kpoints':
                         if self.Band:
                                 self.num_divisions = elem.find('generation').find('i')
@@ -213,13 +224,13 @@ class Vasprun:
                                         kp_parse_vals = elem.find('varray') if elem.find('varray').attrib['name'] == 'kpointlist' else None
                                         if kp_parse_vals != None:
                                                 num_paths = len(kp_parse_vals.findall('v'))/self.num_divisions
-                                                kpoint_list = np.zeros([self.num_divisions*num_paths, 3])
-                                                for i, row in enumerate(kp_parse_vals):
-                                                        kpoint_list[i,:] = [float(val) for val in row.text.strip().split()]
-                                                self.kpoint_divisions = np.empty([2*num_paths, 3])
+                                                #kpoint_list = np.zeros([self.num_divisions*num_paths, 3])
+                                                kpoint_list = [[float(val) for val in row.text.strip().split()] for row in kp_parse_vals]
+                                                # self.kpoint_divisions = np.empty([2*num_paths, 3])
+                                                self.kpoint_divisions = [[0.0, 0.0, 0.0] for d in range(2*num_paths)]
                                                 for i in range(num_paths):
-                                                        self.kpoint_divisions[2*i] = kpoint_list[i*self.num_divisions,:]
-                                                        self.kpoint_divisions[2*i+1] = kpoint_list[(i+1)*self.num_divisions-1, :]
+                                                        self.kpoint_divisions[2*i] = kpoint_list[i*self.num_divisions]
+                                                        self.kpoint_divisions[2*i+1] = kpoint_list[(i+1)*self.num_divisions-1]
                                                 kp_parse_vals.clear()
                                 else:
                                         self.kpoint_divisions = False
@@ -241,12 +252,12 @@ class Vasprun:
 
 
                 elif elem.tag == 'structure':
-                        self.is_complete = False
+                        self._is_complete = False
                         if 'name' in elem.attrib:
                                 if elem.attrib['name'] == 'finalpos':
                                         #finding the final structure
                                         finalpos = elem
-                                        self.is_complete = True
+                                        self._is_complete = True
 
                                         # collect the final lattice
                                         self.lattice = []

@@ -1,8 +1,9 @@
 from __future__ import (absolute_import, division, print_function, unicode_literals)
 from builtins import *
 
-import numpy as np
 import math
+
+from casm.vasp.io.util import dot,cross,norm
 
 class PoscarError(Exception):
     def __init__(self,msg):
@@ -20,7 +21,7 @@ class Site:
             self.SD_FLAG = string for selective dynamics description, empty string by default (ex. "T F F").
             self.occupant = CASM specie name, empty string by default
             self.occ_alias = alias (POTCAR) name, empty string by default
-            self.position = np.array coordinate
+            self.position = coordinate
     """
     def __init__(self, cart, position, SD_FLAG = "", occupant = "", occ_alias = ""):
         """ Site constructor """
@@ -28,14 +29,13 @@ class Site:
         self.SD_FLAG = SD_FLAG
         self.occupant = occupant
         self.occ_alias = occ_alias
-        if not isinstance(position, np.ndarray):
-            raise PoscarError("Attempting to construct a Site and 'position' is not a numpy ndarray")
         self.position = position
 
 
     def write(self, file):
         """ Write this Site to a file """
-        np.savetxt(file,self.position,fmt='%.8f',newline = '    ')
+        file.write(' '.join(["{:.8f}".format(x) for x in self.position]))
+        file.write('    ')
         file.write(self.SD_FLAG)
         file.write(self.occupant)
         file.write('\n')
@@ -69,8 +69,8 @@ class Poscar:
     def read(self, filename, species=None, legacy_support=True):
         """ Reads a POS/POSCAR from 'filename'"""
         self.basis = []
-        self._lattice = np.zeros((3,3))
-        self._reciprocal_lattice = np.zeros((3,3))
+        self._lattice = [[0.0, 0.0, 0.0],[0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]
+        self._reciprocal_lattice = [[0.0, 0.0, 0.0],[0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]
         self.coord_mode = ''
         self.SD_FLAG = False
         self.num_atoms = []
@@ -118,8 +118,9 @@ class Poscar:
             raise PoscarError("Could not write: " + filename)
         file.write(str(self.header)+'\n')
         file.write(str(self.scaling)+'\n')
-        np.savetxt(file,self._lattice, newline = '\n', fmt='%.8f' )
-
+        for i in range(3):
+            file.write(' '.join(["{:.8f}".format(x) for x in self._lattice[i]]))
+            file.write('\n')
         if sort:
             type_line = ''
             num_line = ''
@@ -148,16 +149,16 @@ class Poscar:
 
 
     def lattice(self, index = None):
-        """ Returns the lattice, or lattice vector 'index', as numpy array"""
+        """ Returns the lattice, or lattice vector 'index', as array"""
         if index != None:
-            return self._lattice[index,:]
+            return self._lattice[index]
         return self._lattice
 
 
     def reciprocal_lattice(self, index = None):
-        """ Returns the reciprocal lattice vector 'index', as numpy array"""
+        """ Returns the reciprocal lattice vector 'index', as array"""
         if index != None:
-            return self._reciprocal_lattice[index,:]
+            return self._reciprocal_lattice[index]
         return self._reciprocal_lattice
 
 
@@ -165,7 +166,7 @@ class Poscar:
         """ Returns scalar triple product of lattice vectors """
         if lattice is None:
             lattice = self._lattice
-        return np.inner(lattice[0,:], np.cross(lattice[1,:],lattice[2,:]))
+        return dot(lattice[0], cross(lattice[1],lattice[2]))
 
 
     def reciprocal_volume(self, reciprocal_lattice=None):
@@ -242,10 +243,14 @@ class Poscar:
                 lat.append([float(x) for x in line.split()])
             except ValueError:
                 raise PoscarError("Could not read lattice vector: '" + line + "'")
-        self._lattice = self.scaling*np.array(lat)
-        if self._lattice.shape!=(3,3):
-            raise PoscarError("Lattice shape error: " + np.array_str(self._lattice))
-        self._reciprocal_lattice = 2.0*math.pi*np.linalg.inv(np.transpose(self._lattice))
+        for i in range(3):
+            self._lattice[i] = [v*self.scaling for v in lat[i]]
+            if len(self._lattice[i])!=3:
+                raise PoscarError("Lattice shape error: " + self._lattice)
+        cx = dot(self._lattice[0],cross(self._lattice[1],self._lattice[2]))
+        self._reciprocal_lattice[0] = [v*2.0*math.pi/cx for v in cross(self._lattice[1],self._lattice[2])]
+        self._reciprocal_lattice[1] = [v*2.0*math.pi/cx for v in cross(self._lattice[2],self._lattice[0])]
+        self._reciprocal_lattice[2] = [v*2.0*math.pi/cx for v in cross(self._lattice[0],self._lattice[1])]
         self.scaling=1.0
         return
 
@@ -347,7 +352,7 @@ class Poscar:
                     pos = [float(x) for x in words[0:3]]
                 except ValueError:
                     raise PoscarError("Error reading basis coordinate: '" + line + "'")
-                self.basis.append(Site(cart, np.array(pos), SD_FLAG, self.type_atoms[i], self.type_atoms[i]))
+                self.basis.append(Site(cart, pos, SD_FLAG, self.type_atoms[i], self.type_atoms[i]))
 
 
     def _read_basis_legacy(self,file):
@@ -387,7 +392,7 @@ class Poscar:
                         self.type_atoms_alias[i] = atom_type
                 else:
                     atom_type = self.type_atoms[i]
-                self.basis.append(Site(cart, np.array(pos), SD_FLAG, atom_type, atom_type))
+                self.basis.append(Site(cart, pos, SD_FLAG, atom_type, atom_type))
 
 
 

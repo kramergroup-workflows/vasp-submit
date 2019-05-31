@@ -1,5 +1,7 @@
 from distutils.core import setup
 from distutils.command.bdist_dumb import bdist_dumb
+from setuptools import setup, find_namespace_packages
+
 
 class custom_bdist_dumb(bdist_dumb):
 
@@ -15,6 +17,5 @@ if __name__ == '__main__':
         cmdclass = {'bdist_dumb': custom_bdist_dumb},
         name='vasp-driver',
         py_modules = ['__main__'],
-        packages = ['casm'],
-        package_dir = {'': ''}
+        packages = find_namespace_packages(include=['casm.*'])
     )

@@ -26,7 +26,7 @@ envsubst '$NUM_NODES $JOB_NAME $JOB_EMAIL' > /data/vasp/qscript <<"EOF"
 #SBATCH --mail-type=END,FAIL
 #SBATCH --mail-user=$JOB_EMAIL
 
-VASP="vasp.5.4.4.intel.std"
+VASP="vasp"
 
 module load intel-mpi/2018.1.163
 module load intel-compilers/2018.1.163
@@ -48,7 +48,7 @@ ssh -i /ssh/id_rsa -oStrictHostKeyChecking=no $USERNAME@$HOSTNAME "mkdir -p /scr
 scp -i /ssh/id_rsa -oStrictHostKeyChecking=no -r /data/vasp $USERNAME@$HOSTNAME:/scratch/$USERNAME/$BASEDIR/$JOB_NAME
 
 # Copy vasp
-scp -i /ssh/id_rsa -oStrictHostKeyChecking=no /bin/vasp.5.4.4.intel.std $USERNAME@$HOSTNAME:/scratch/$USERNAME/$BASEDIR/$JOB_NAME
+scp -i /ssh/id_rsa -oStrictHostKeyChecking=no /bin/$VASP $USERNAME@$HOSTNAME:/scratch/$USERNAME/$BASEDIR/$JOB_NAME/vasp
 
 # Submit job
 ssh -i /ssh/id_rsa -oStrictHostKeyChecking=no $USERNAME@$HOSTNAME "cd /scratch/$USERNAME/$BASEDIR/$JOB_NAME && sbatch qscript"

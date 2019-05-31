@@ -6,7 +6,7 @@ import re
 import shutil
 import six
 import sys
-from casm.vasp.io import incar, kpoints, oszicar, outcar, species, poscar
+from casm.vasp.io import incar, kpoints, oszicar, outcar, species, poscar 
 
 VASP_INPUT_FILE_LIST = ["INCAR", "STOPCAR", "POTCAR", "KPOINTS", "POSCAR",\
                         "EXHCAR", "CHGCAR", "WAVECAR", "TMPCAR"]

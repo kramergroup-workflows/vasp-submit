@@ -4,6 +4,7 @@ import sys
 import math
 import os
 
+from casm.vasp import Relax, run
 
 def factor_int(n):
   '''
@@ -48,7 +49,10 @@ def parallelisation_pattern(ncpus):
   ncore = min(10,ncpus)
   if ncpus > 10:
     npar,kpar = factor_int(ncpus/ncore)
-
+  else:
+    npar = 1
+    kpar = 1
+    
   return ncore,npar,kpar
 
 
@@ -65,9 +69,9 @@ def run_simple(ncpus=None):
 
   ncore,npar,kpar = parallelisation_pattern(ncpus)
 
-  casm.vasp.run(ncpus=ncpus,ncore=ncore,kpar=kpar,npar=npar)
+  run(ncpus=ncpus,ncore=ncore,kpar=kpar,npar=npar)
 
-def run_relax():
+def run_relax(ncpus=None):
   '''
   Do a complex relaxation run with mutliple relax iterations and a final static 
   calculation.
@@ -77,7 +81,7 @@ def run_relax():
   '''
 
   ncore,npar,kpar = parallelisation_pattern(ncpus)
-  relaxation = casm.vasp.Relax(settings={
+  relaxation = Relax(settings={
     "ncore": ncore,
     "npar": npar,
     "kpar": kpar

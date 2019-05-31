@@ -2,15 +2,13 @@
 # -----------------------------
 # The CASM python library contains a useful wapper that does multiple runs etc. 
 # We will repackage that and distribute as driver for Vasp calculations.
-FROM continuumio/miniconda3 as py
+FROM rackspacedot/python37 as py
 
-RUN conda install -c prisms-center/label/dev -c conda-forge -c prisms-center casm-python
 COPY src /src
 
 WORKDIR /src
-RUN mkdir /assets
 RUN python setup.py bdist --format=zip
-RUN ls -la
+
 
 # Obtain VASP 
 # -----------------------------
@@ -52,13 +50,16 @@ ENV BASEDIR "workflows"
 # in the queue
 ENV JOB_NAME "vasp"
 
+# The VASP executable to use
+ENV VASP vasp.5.4.4.intel.std
+
 # An email will be send to this address when the job
 # has completed or was terminated
 ENV JOB_EMAIL "noreply@nowhere.com"
 
 RUN apk --no-cache add openssh-client bash gettext
 COPY --from=s3 bin/* /assets/
-COPY --from=casm /assets/vasp_driver /assets/vasp_driver
+COPY --from=casm /src/dist/vasp-driver*.zip /assets/vasp_driver.pyx
 
 COPY entrypoint.sh /entrypoint.sh
 
