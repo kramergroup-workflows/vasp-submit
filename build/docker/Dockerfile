@@ -1,4 +1,17 @@
-    
+# Create Vasp Wapper script
+# -----------------------------
+# The CASM python library contains a useful wapper that does multiple runs etc. 
+# We will repackage that and distribute as driver for Vasp calculations.
+FROM continuumio/miniconda3 as py
+
+RUN conda install -c prisms-center/label/dev -c conda-forge -c prisms-center casm-python
+COPY src /src
+
+WORKDIR /src
+RUN mkdir /assets
+RUN python setup.py bdist --format=zip
+RUN ls -la
+
 # Obtain VASP 
 # -----------------------------
 # The VASP binary cannot be publicly distributed due to license constrains
@@ -44,7 +57,9 @@ ENV JOB_NAME "vasp"
 ENV JOB_EMAIL "noreply@nowhere.com"
 
 RUN apk --no-cache add openssh-client bash gettext
-COPY --from=s3 bin/* /bin/
+COPY --from=s3 bin/* /assets/
+COPY --from=casm /assets/vasp_driver /assets/vasp_driver
+
 COPY entrypoint.sh /entrypoint.sh
 
 ENTRYPOINT [ "/entrypoint.sh" ]
