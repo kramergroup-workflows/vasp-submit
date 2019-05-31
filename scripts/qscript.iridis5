@@ -1,10 +1,10 @@
 #!/bin/bash
 #SBATCH --ntasks-per-node=40     # Tasks per node
-#SBATCH --nodes=1    # Number of nodes requested
-#SBATCH --time=24:00:00          # walltime
-#SBATCH --job-name=vasp
+#SBATCH --nodes=$NUM_NODES    # Number of nodes requested
+#SBATCH --time=$WALLTIME          # walltime
+#SBATCH --job-name=$JOB_NAME
 #SBATCH --mail-type=END,FAIL
-#SBATCH --mail-user=noreply@nowhere.com
+#SBATCH --mail-user=$JOB_EMAIL
 
 VASP="vasp"
 
@@ -18,4 +18,4 @@ cd $SLURM_SUBMIT_DIR
 
 # mpirun -np 40 $SLURM_SUBMIT_DIR/$VASP
 export PATH=$(pwd):$PATH
-python vasp-driver.pyz relax
+python vasp-driver.pyz $JOB_TYPE

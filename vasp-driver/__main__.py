@@ -21,7 +21,7 @@ def factor_int(n):
       solution = True
     else:
       val-=1
-  return val, val2, n
+  return val, val2
 
 
 def parallelisation_pattern(ncpus):
@@ -38,9 +38,9 @@ def parallelisation_pattern(ncpus):
 
   if ncpus is None:
     if "PBS_NP" in os.environ:
-      ncpus = os.environ["PBS_NP"]
+      ncpus = int(os.environ["PBS_NP"])
     elif "SLURM_NTASKS" in os.environ:
-      ncpus = os.environ["SLURM_NTASKS"]
+      ncpus = int(os.environ["SLURM_NTASKS"])
     else:
       ncpus = 1
   
