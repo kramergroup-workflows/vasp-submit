@@ -18,4 +18,4 @@ cd $SLURM_SUBMIT_DIR
 
 # mpirun -np 40 $SLURM_SUBMIT_DIR/$VASP
 export PATH=$(pwd):$PATH
-python vasp-driver.pyz $JOB_TYPE
+python vasp-driver.pyz $JOB_TYPE $SLURM_SUBMIT_DIR
