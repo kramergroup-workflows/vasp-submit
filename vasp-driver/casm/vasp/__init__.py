@@ -19,6 +19,7 @@ from casm.vasp.run import \
     run
 from casm.vasp.relax import Relax
 from casm.vasp.converge import Converge
+from casm.vasp.properties import properties
 
 __all__ = [
     'io',
@@ -39,4 +40,5 @@ __all__ = [
     'complete_job',
     'run',
     'Relax',
-    'Converge']
+    'Converge',
+    'properties']

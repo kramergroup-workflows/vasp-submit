@@ -3,9 +3,14 @@
 import sys
 import math
 import os
+import argparse
+import six
+import json
 
 from casm.vasp import Relax, run
 from casm.vasp.io import job_complete
+from casm.vasp import properties
+from casm.misc.noindent import NoIndentEncoder
 
 def factor_int(n):
   '''
@@ -59,7 +64,7 @@ def parallelisation_pattern(ncpus):
 
 
 
-def run_simple(ncpus=None):
+def run_simple(args):
   '''
   Start vasp as is without any complex reruns or substantial
   editing of the vasp input files.
@@ -68,11 +73,11 @@ def run_simple(ncpus=None):
   We will operate with NCORE=10 (which seems to be a reasonable value on Iridis5)
   '''
 
-  ncore,npar,kpar = parallelisation_pattern(ncpus) 
+  ncore,npar,kpar = parallelisation_pattern(args.ncpus) 
+  jobdir = os.path.abspath(args.vaspdir)
+  run(jobdir,ncpus=args.ncpus,ncore=ncore,kpar=kpar,npar=npar)
 
-  run(ncpus=ncpus,ncore=ncore,kpar=kpar,npar=npar)
-
-def run_relax(ncpus=None):
+def run_relax(args):
   '''
   Do a complex relaxation run with mutliple relax iterations and a final static 
   calculation.
@@ -82,7 +87,8 @@ def run_relax(ncpus=None):
   '''
 
   ncore,npar,kpar = parallelisation_pattern(ncpus)
-  relaxation = Relax(settings={
+  relaxdir = os.path.abspath(args.vaspdir)
+  relaxation = Relax(relaxdir,settings={
     "ncore": ncore,
     "npar": npar,
     "kpar": kpar
@@ -90,13 +96,13 @@ def run_relax(ncpus=None):
 
   relaxation.run()
 
-def run_converge():
+def run_converge(args):
   '''
   Converges a property
   '''
   raise Exception('Not yet implemented.')
 
-def run_check():
+def run_check(args):
   '''
   Checks if a VASP run run has finished 
   '''
@@ -112,14 +118,45 @@ def run_check():
   # Does not seem to be a completed vasp run
   exit(1)
   
+def run_properties(args):
+  '''
+  Collect properties of the vasp run
+  '''
 
-
+  parser = argparse.ArgumentParser(description='Collect properties from VASP run.')
+  parser.add_argument('--speciesfile', help='location of the SPECIES file in a CASM project')
+  parser.add_argument('--super-poscar', help='location of the super-POSCAR file in a CASM project')
+  
+  props = properties(os.path.abspath(args.vaspdir), args.super_poscar, args.speciesfile)
+  print(json.dumps(props,cls=NoIndentEncoder, indent=2))
+  # with open('properties.json','wb') as file:
+  #   json.dump(props, file, indent=4)
 
 ##################################################################################
 # MAIN
 ##################################################################################
 
 if __name__ == '__main__':
+
+  parser = argparse.ArgumentParser(prog="vasp-driver")
+  subparsers = parser.add_subparsers(help='commands')
+  
+  simple_parser = subparsers.add_parser('simple', help='Perform a simple VASP run')
+  simple_parser.add_argument('--ncpus', action='store', default=1, help='Total number of CPUs')
+  simple_parser.add_argument('vaspdir', default=os.getcwd(), action='store', help='location of the VASP input files')
+
+  relax_parser = subparsers.add_parser('relax', help='Perform a relaxation run')
+  relax_parser.add_argument('--ncpus', action='store', default=1, help='Total number of CPUs')
+  relax_parser.add_argument('vaspdir', default=os.getcwd(), action='store', help='location of the VASP input files')
+
+  prop_parser = subparsers.add_parser('properties', help='Compute properties of an existing VASP run')
+  prop_parser.add_argument('--speciesfile', action='store', help='location of the SPECIES file in a CASM project')
+  prop_parser.add_argument('--super-poscar', action='store', help='location of the super-POSCAR file in a CASM project')
+  prop_parser.add_argument('vaspdir', default=os.getcwd(), action='store', help='location of the VASP run')
+  
+  
+  args = parser.parse_args()
+
   # Select the operation mode
   mode = "simple"
   if len(sys.argv) > 1:
@@ -129,10 +166,11 @@ if __name__ == '__main__':
     "simple": run_simple,
     "relax": run_relax,
     "converge": run_converge,
-    "check": run_check
+    "check": run_check,
+    "properties": run_properties
   }
 
   run_func = modes.get(mode, lambda: "Invalid mode")
-  run_func()
+  run_func(args)
 
 
