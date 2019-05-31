@@ -22,7 +22,7 @@ chmod u+x /data/vasp/qscript
 
 # Make sure the scratch directory exists
 echo "Creating job directory"
-ssh -i /ssh/id_rsa -oStrictHostKeyChecking=no $USERNAME@$HOSTNAME "mkdir -p /scratch/$USERNAME/$BASEDIR"
+ssh -i /ssh/id_rsa -oStrictHostKeyChecking=no $USERNAME@$HOSTNAME "mkdir -p /scratch/$USERNAME/$BASEDIR/$JOB_NAME"
 
 SUBPATH=$1
 
