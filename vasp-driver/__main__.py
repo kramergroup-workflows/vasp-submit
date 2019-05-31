@@ -67,7 +67,7 @@ def run_simple(ncpus=None):
   We will operate with NCORE=10 (which seems to be a reasonable value on Iridis5)
   '''
 
-  ncore,npar,kpar = parallelisation_pattern(ncpus)
+  ncore,npar,kpar = parallelisation_pattern(ncpus) 
 
   run(ncpus=ncpus,ncore=ncore,kpar=kpar,npar=npar)
 

@@ -4,13 +4,10 @@
 # We will repackage that and distribute as driver for Vasp calculations.
 FROM rackspacedot/python37 as py
 
-COPY src /src
+WORKDIR /work
+COPY vasp-driver /work/vasp-driver
 
-RUN pip install --upgrade pip
-RUN pip install "setuptools>=41.0.0"
-
-WORKDIR /src
-RUN python setup.py bdist --format=zip
+RUN python -m zipapp -p "/usr/bin/env python" vasp-driver
 
 
 # Obtain VASP 
@@ -53,6 +50,10 @@ ENV BASEDIR "workflows"
 # in the queue
 ENV JOB_NAME "vasp"
 
+# The JOB_Type is used by the vasp-driver to determine what type of workflow
+# should be initiated
+ENV JOB_TYPE "relax"
+
 # The VASP executable to use
 ENV VASP vasp.5.4.4.intel.std
 
@@ -62,8 +63,8 @@ ENV JOB_EMAIL "noreply@nowhere.com"
 
 RUN apk --no-cache add openssh-client bash gettext
 COPY --from=s3 bin/* /assets/
-COPY --from=py /src/dist/vasp-driver*.zip /assets/vasp-driver.pyx
+COPY --from=py /work/vasp-driver.pyz /assets/vasp-driver.pyz
 
-COPY entrypoint.sh /entrypoint.sh
+COPY scripts/entrypoint.sh /entrypoint.sh
 
 ENTRYPOINT [ "/entrypoint.sh" ]

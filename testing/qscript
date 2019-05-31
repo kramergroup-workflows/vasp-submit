@@ -1,0 +1,21 @@
+#!/bin/bash
+#SBATCH --ntasks-per-node=40     # Tasks per node
+#SBATCH --nodes=1    # Number of nodes requested
+#SBATCH --time=12:00:00          # walltime
+#SBATCH --job-name=vasp
+#SBATCH --mail-type=END,FAIL
+#SBATCH --mail-user=noreply@nowhere.com
+
+VASP="vasp"
+
+module load intel-mpi/2018.1.163
+module load intel-compilers/2018.1.163
+module load intel-mkl/2018.1.163
+moudle load python 
+
+echo "Run directory: $SLURM_SUBMIT_DIR"
+cd $SLURM_SUBMIT_DIR
+
+# mpirun -np 40 $SLURM_SUBMIT_DIR/$VASP
+export PATH=$(pwd):$PATH
+python vasp-driver.pyz $JOB_TYPE
