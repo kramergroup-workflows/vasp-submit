@@ -68,6 +68,7 @@ ENV VASP vasp.5.4.4.intel.std
 ENV JOB_EMAIL "noreply@nowhere.com"
 
 RUN apk --no-cache add openssh-client bash gettext
+RUN mkdir -p /assets/iridis5
 COPY --from=s3 bin/* /assets/iridis5/
 COPY --from=py /work/vasp-driver.pyz /assets/vasp-driver.pyz
 
