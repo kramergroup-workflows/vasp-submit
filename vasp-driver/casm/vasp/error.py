@@ -8,6 +8,8 @@ import shutil
 import re
 import sys
 import time
+import warnings
+import gzip
 
 from casm.vasp import io
 

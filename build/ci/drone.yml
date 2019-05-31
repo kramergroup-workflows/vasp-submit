@@ -3,15 +3,28 @@ kind: pipeline
 name: default
 
 steps: 
-- name: kaniko
+- name: vasp-submit
   image: banzaicloud/drone-kaniko
   settings:
     username: 
       from_secret: docker-hub-username
     password: 
       from_secret: docker-hub-password
-    repo: registry.kramergroup.science/workflows/submit-vasp-to-iridis5
-    dockerfile: build/docker/Dockerfile
+    repo: registry.kramergroup.science/workflows/vasp-submit
+    dockerfile: build/docker/vasp-submit/Dockerfile
+    build_args:
+      from_secret: build-args
+      # build-args should be a komma-separated string:
+      #  S3_HOST=hostname:port,S3_ACCESS_KEY_ID=id,S3_SECRET_ACCESS_KEY=secret
+- name: vasp-collect
+  image: banzaicloud/drone-kaniko
+  settings:
+    username: 
+      from_secret: docker-hub-username
+    password: 
+      from_secret: docker-hub-password
+    repo: registry.kramergroup.science/workflows/vasp-collect
+    dockerfile: build/docker/vasp-collect/Dockerfile
     build_args:
       from_secret: build-args
       # build-args should be a komma-separated string:

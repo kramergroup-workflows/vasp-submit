@@ -5,6 +5,7 @@ import math
 import os
 
 from casm.vasp import Relax, run
+from casm.vasp.io import job_complete
 
 def factor_int(n):
   '''
@@ -95,6 +96,24 @@ def run_converge():
   '''
   raise Exception('Not yet implemented.')
 
+def run_check():
+  '''
+  Checks if a VASP run run has finished 
+  '''
+
+  ## Look for a 'final' directory from relaxation runs and check
+  if os.path.exists('run.final') and job_complete('run.final'):
+      exit(0)
+  
+  ## Seems to be a simple job. Check current directory
+  if job_complete():
+    exit(0)
+
+  # Does not seem to be a completed vasp run
+  exit(1)
+  
+
+
 
 ##################################################################################
 # MAIN
@@ -109,7 +128,8 @@ if __name__ == '__main__':
   modes = {
     "simple": run_simple,
     "relax": run_relax,
-    "converge": run_converge
+    "converge": run_converge,
+    "check": run_check
   }
 
   run_func = modes.get(mode, lambda: "Invalid mode")

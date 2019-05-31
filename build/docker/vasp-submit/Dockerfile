@@ -71,7 +71,7 @@ RUN apk --no-cache add openssh-client bash gettext
 COPY --from=s3 bin/* /assets/iridis5/
 COPY --from=py /work/vasp-driver.pyz /assets/vasp-driver.pyz
 
-COPY scripts/entrypoint.sh /entrypoint.sh
+COPY build/docker/vasp-submit/entrypoint.sh /entrypoint.sh
 COPY scripts/qscript.* /assets
 
 ENTRYPOINT [ "/entrypoint.sh" ]
