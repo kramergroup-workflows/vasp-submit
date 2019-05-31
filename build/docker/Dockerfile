@@ -6,6 +6,9 @@ FROM rackspacedot/python37 as py
 
 COPY src /src
 
+RUN pip install --upgrade pip
+RUN pip install "setuptools>=41.0.0"
+
 WORKDIR /src
 RUN python setup.py bdist --format=zip
 
