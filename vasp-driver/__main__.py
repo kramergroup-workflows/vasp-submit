@@ -86,7 +86,7 @@ def run_relax(args):
   We will operate with NCORE=10 (which seems to be a reasonable value on Iridis5)
   '''
 
-  ncore,npar,kpar = parallelisation_pattern(ncpus)
+  ncore,npar,kpar = parallelisation_pattern(args.ncpus)
   relaxdir = os.path.abspath(args.vaspdir)
   relaxation = Relax(relaxdir,settings={
     "ncore": ncore,
@@ -154,7 +154,9 @@ if __name__ == '__main__':
   prop_parser.add_argument('--super-poscar', action='store', help='location of the super-POSCAR file in a CASM project')
   prop_parser.add_argument('vaspdir', default=os.getcwd(), action='store', help='location of the VASP run')
   
-  
+  check_parser = subparsers.add_parser('check', help='Perform a simple VASP run')
+
+
   args = parser.parse_args()
 
   # Select the operation mode
