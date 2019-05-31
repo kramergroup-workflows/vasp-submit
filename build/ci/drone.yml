@@ -2,7 +2,7 @@
 kind: pipeline
 name: default
 
-steps:
+steps: 
 - name: kaniko
   image: banzaicloud/drone-kaniko
   settings:
