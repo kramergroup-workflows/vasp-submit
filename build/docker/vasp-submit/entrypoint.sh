@@ -24,13 +24,15 @@ chmod u+x /data/vasp/qscript
 echo "Creating job directory"
 ssh -i /ssh/id_rsa -oStrictHostKeyChecking=no $USERNAME@$HOSTNAME "mkdir -p /scratch/$USERNAME/$BASEDIR/$JOB_NAME"
 
+# The first parameter passed to the script is taken as the 
+# subpath containing the VASP input files
 SUBPATH=$1
 
 # Copy the input files
 # We pipe this through a tar command because it allows to write files to a folder without wildcards (which are problematic in scp)
 echo "Copying VASP input files"
 cd /data/vasp/$1
-tar czf - -C /data/vasp * | ssh -i /ssh/id_rsa -oStrictHostKeyChecking=no $USERNAME@$HOSTNAME "( cd /scratch/$USERNAME/$BASEDIR/$JOB_NAME; tar xzf - )"
+tar czf - -C /data/vasp/$1 * | ssh -i /ssh/id_rsa -oStrictHostKeyChecking=no $USERNAME@$HOSTNAME "( cd /scratch/$USERNAME/$BASEDIR/$JOB_NAME; tar xzf - )"
 
 # scp -i /ssh/id_rsa -oStrictHostKeyChecking=no -r /data/vasp/* $USERNAME@$HOSTNAME:/scratch/$USERNAME/$BASEDIR/$JOB_NAME
 
