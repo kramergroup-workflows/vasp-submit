@@ -16,17 +16,19 @@ fi
 # Calculate number of nodes (TODO This should be smarter )
 export NUM_NODES=1
 
+
+# The first parameter passed to the script is taken as the 
+# subpath containing the VASP input files
+SUBPATH=$1
+
 # Create a submit script and make sure it's executable
-cat /assets/qscript.$CLUSTER | envsubst '$NUM_NODES $JOB_NAME $JOB_EMAIL $JOB_TYPE $WALLTIME' > /data/vasp/qscript
-chmod u+x /data/vasp/qscript
+cat /assets/qscript.$CLUSTER | envsubst '$NUM_NODES $JOB_NAME $JOB_EMAIL $JOB_TYPE $WALLTIME' > /data/vasp/$1/qscript
+chmod u+x /data/vasp/$1/qscript
 
 # Make sure the scratch directory exists
 echo "Creating job directory"
 ssh -i /ssh/id_rsa -oStrictHostKeyChecking=no $USERNAME@$HOSTNAME "mkdir -p /scratch/$USERNAME/$BASEDIR/$JOB_NAME"
 
-# The first parameter passed to the script is taken as the 
-# subpath containing the VASP input files
-SUBPATH=$1
 
 # Copy the input files
 # We pipe this through a tar command because it allows to write files to a folder without wildcards (which are problematic in scp)
