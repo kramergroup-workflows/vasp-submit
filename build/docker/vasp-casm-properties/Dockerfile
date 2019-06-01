@@ -26,4 +26,6 @@ RUN apk add --no-cache python3 && \
 COPY --from=py /work/vasp-driver.pyz /assets/vasp-driver.pyz
 COPY build/docker/vasp-collect/entrypoint.sh /entrypoint.sh
 
+WORKDIR "/data/vasp"
+
 ENTRYPOINT [ "python3", "/assets/vasp-driver.pyz", "properties" ]

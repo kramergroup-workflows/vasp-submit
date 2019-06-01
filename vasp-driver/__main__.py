@@ -124,9 +124,13 @@ def run_properties(args):
   '''
   
   props = properties(os.path.abspath(args.vaspdir), args.super_poscar, args.speciesfile)
-  print(json.dumps(props,cls=NoIndentEncoder, indent=2))
-  with open(args.propertiesfile,'wb') as file:
-    json.dump(props, file, indent=4)
+  propstr = json.dumps(props,cls=NoIndentEncoder, indent=2)
+
+  with open(args.propertiesfile,'w') as file:
+    file.write(propstr)
+
+  print(propstr)
+
 
 ##################################################################################
 # MAIN
