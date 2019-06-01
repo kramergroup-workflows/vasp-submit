@@ -122,15 +122,11 @@ def run_properties(args):
   '''
   Collect properties of the vasp run
   '''
-
-  parser = argparse.ArgumentParser(description='Collect properties from VASP run.')
-  parser.add_argument('--speciesfile', help='location of the SPECIES file in a CASM project')
-  parser.add_argument('--super-poscar', help='location of the super-POSCAR file in a CASM project')
   
   props = properties(os.path.abspath(args.vaspdir), args.super_poscar, args.speciesfile)
   print(json.dumps(props,cls=NoIndentEncoder, indent=2))
-  # with open('properties.json','wb') as file:
-  #   json.dump(props, file, indent=4)
+  with open(args.properties_file,'wb') as file:
+    json.dump(props, file, indent=4)
 
 ##################################################################################
 # MAIN
@@ -153,6 +149,7 @@ if __name__ == '__main__':
   prop_parser.add_argument('--speciesfile', action='store', help='location of the SPECIES file in a CASM project')
   prop_parser.add_argument('--super-poscar', action='store', help='location of the super-POSCAR file in a CASM project')
   prop_parser.add_argument('vaspdir', default=os.getcwd(), action='store', help='location of the VASP run')
+  prop_parser.add_argument('properties-file', default="properties.calc.json", action='store', help='name of the properties JSON file')
   
   check_parser = subparsers.add_parser('check', help='Perform a simple VASP run')
 
