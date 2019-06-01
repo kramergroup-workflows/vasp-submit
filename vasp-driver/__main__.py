@@ -92,6 +92,7 @@ def run_relax(args):
     "ncore": ncore,
     "npar": npar,
     "kpar": kpar,
+    "ncpus": args.ncpus,
     "vasp_cmd": args.command
   })
 
