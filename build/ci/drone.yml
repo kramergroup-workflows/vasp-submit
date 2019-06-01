@@ -29,3 +29,16 @@ steps:
       from_secret: build-args
       # build-args should be a komma-separated string:
       #  S3_HOST=hostname:port,S3_ACCESS_KEY_ID=id,S3_SECRET_ACCESS_KEY=secret
+- name: vasp-casm-properties
+  image: banzaicloud/drone-kaniko
+  settings:
+    username: 
+      from_secret: docker-hub-username
+    password: 
+      from_secret: docker-hub-password
+    repo: registry.kramergroup.science/workflows/vasp-casm-properties
+    dockerfile: build/docker/vasp-casm-properties/Dockerfile
+    build_args:
+      from_secret: build-args
+      # build-args should be a komma-separated string:
+      #  S3_HOST=hostname:port,S3_ACCESS_KEY_ID=id,S3_SECRET_ACCESS_KEY=secret
