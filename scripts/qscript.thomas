@@ -1,0 +1,16 @@
+#!/bin/bash -l
+#$ -S /bin/bash
+#$ -P Gold
+#$ -A Soton_allocation
+#$ -N $JOB_NAME
+#$ -pe mpi 48
+#$ -l h_rt=$WALLTIME
+#$ -wd /home/$USERNAME/Scratch/workflows/$JOB_NAME
+
+VASP="vasp.5.4.4.intel.std"
+
+module load compilers/intel/2017/update1
+module load mpi/intel/2017/update1/intel
+
+export PATH=$(pwd):$PATH
+python3 vasp-driver.pyz --command "gerun $VASP" $JOB_TYPE

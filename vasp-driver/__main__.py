@@ -75,7 +75,7 @@ def run_simple(args):
 
   ncore,npar,kpar = parallelisation_pattern(args.ncpus) 
   jobdir = os.path.abspath(args.vaspdir)
-  run(jobdir,ncpus=args.ncpus,ncore=ncore,kpar=kpar,npar=npar)
+  run(jobdir,ncpus=args.ncpus,ncore=ncore,kpar=kpar,npar=npar, command=args.command)
 
 def run_relax(args):
   '''
@@ -91,7 +91,8 @@ def run_relax(args):
   relaxation = Relax(relaxdir,settings={
     "ncore": ncore,
     "npar": npar,
-    "kpar": kpar
+    "kpar": kpar,
+    "vasp_cmd": args.command
   })
 
   relaxation.run()
@@ -143,10 +144,12 @@ if __name__ == '__main__':
   
   simple_parser = subparsers.add_parser('simple', help='Perform a simple VASP run')
   simple_parser.add_argument('--ncpus', action='store', default=1, help='Total number of CPUs')
+  simple_parser.add_argument('--command', action='store', default='vasp', help="The Vasp command to execute (eg. mpirun -np {NCPUS} vasp)")
   simple_parser.add_argument('vaspdir', default=os.getcwd(), action='store', help='location of the VASP input files')
 
   relax_parser = subparsers.add_parser('relax', help='Perform a relaxation run')
   relax_parser.add_argument('--ncpus', action='store', default=1, help='Total number of CPUs')
+  relax_parser.add_argument('--command', action='store', default='vasp', help="The Vasp command to execute (eg. mpirun -np {NCPUS} vasp)")
   relax_parser.add_argument('vaspdir', default=os.getcwd(), action='store', help='location of the VASP input files')
 
   prop_parser = subparsers.add_parser('properties', help='Compute properties of an existing VASP run')

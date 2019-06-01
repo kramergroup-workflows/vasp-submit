@@ -22,8 +22,8 @@ export NUM_NODES=1
 SUBPATH=$1
 
 # Create a submit script and make sure it's executable
-cat /assets/qscript.$CLUSTER | envsubst '$NUM_NODES $JOB_NAME $JOB_EMAIL $JOB_TYPE $WALLTIME' > /data/vasp/$1/qscript
-chmod u+x /data/vasp/$1/qscript
+cat /assets/qscript.$CLUSTER | envsubst '$NUM_NODES $JOB_NAME $JOB_EMAIL $JOB_TYPE $WALLTIME' > /data/vasp/$SUBPATH/qscript
+chmod u+x /data/vasp/$SUBPATH/qscript
 
 # Make sure the scratch directory exists
 echo "Creating job directory"

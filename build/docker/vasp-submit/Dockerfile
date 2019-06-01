@@ -24,9 +24,13 @@ ARG S3_SECRET_ACCESS_KEY
 
 RUN mc config host add --insecure minio https://$S3_HOST $S3_ACCESS_KEY_ID $S3_SECRET_ACCESS_KEY
 RUN mc --insecure cp minio/vasp/vasp5.4.4-iridis5-executables.tar.gz /tmp/vasp5.4.4-iridis5-executables.tar.gz
+RUN mc --insecure cp minio/vasp/vasp5.4.4-thomas-executables.tar.gz /tmp/vasp5.4.4-thomas-executables.tar.gz
 
-WORKDIR /bin
+WORKDIR /bin/iridis5
 RUN tar xvzf /tmp/vasp5.4.4-iridis5-executables.tar.gz
+
+WORKDIR /bin/thomas
+RUN tar xvzf /tmp/vasp5.4.4-thomas-executables.tar.gz
 
 # -------------------------------------------------------------------------------------------------------------
 FROM alpine
@@ -68,8 +72,10 @@ ENV VASP vasp.5.4.4.intel.std
 ENV JOB_EMAIL "noreply@nowhere.com"
 
 RUN apk --no-cache add openssh-client bash gettext
-RUN mkdir -p /assets/iridis5
-COPY --from=s3 bin/* /assets/iridis5/
+RUN mkdir -p /assets/iridis5 && \
+    mkdir -p /assets/thomas
+COPY --from=s3 bin/iridis5/* /assets/iridis5/
+COPY --from=s3 bin/thomas/* /assets/thomas/
 COPY --from=py /work/vasp-driver.pyz /assets/vasp-driver.pyz
 
 COPY build/docker/vasp-submit/entrypoint.sh /entrypoint.sh
