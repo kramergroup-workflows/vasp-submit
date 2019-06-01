@@ -5,6 +5,7 @@ name: default
 steps: 
 - name: vasp-submit
   image: banzaicloud/drone-kaniko
+  depends_on: [ clone ]
   settings:
     username: 
       from_secret: docker-hub-username
@@ -18,6 +19,7 @@ steps:
       #  S3_HOST=hostname:port,S3_ACCESS_KEY_ID=id,S3_SECRET_ACCESS_KEY=secret
 - name: vasp-collect
   image: banzaicloud/drone-kaniko
+  depends_on: [ clone ]
   settings:
     username: 
       from_secret: docker-hub-username
@@ -31,6 +33,7 @@ steps:
       #  S3_HOST=hostname:port,S3_ACCESS_KEY_ID=id,S3_SECRET_ACCESS_KEY=secret
 - name: vasp-casm-properties
   image: banzaicloud/drone-kaniko
+  depends_on: [ clone ]
   settings:
     username: 
       from_secret: docker-hub-username
