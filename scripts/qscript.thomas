@@ -5,7 +5,7 @@
 #$ -N $JOB_NAME
 #$ -pe mpi 48
 #$ -l h_rt=$WALLTIME
-#$ -wd /home/$USERNAME/Scratch/workflows/$JOB_NAME
+#$ -wd $JOBDIR
 
 VASP="vasp"
 
