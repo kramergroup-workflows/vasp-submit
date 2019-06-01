@@ -7,7 +7,7 @@
 #$ -l h_rt=$WALLTIME
 #$ -wd /home/$USERNAME/Scratch/workflows/$JOB_NAME
 
-VASP="vasp.5.4.4.intel.std"
+VASP="vasp"
 
 module load compilers/intel/2017/update1
 module load mpi/intel/2017/update1/intel
