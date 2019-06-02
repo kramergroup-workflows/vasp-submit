@@ -144,12 +144,12 @@ if __name__ == '__main__':
   subparsers = parser.add_subparsers(help='commands')
   
   simple_parser = subparsers.add_parser('simple', help='Perform a simple VASP run')
-  simple_parser.add_argument('--ncpus', action='store', default=None, help='Total number of CPUs')
+  simple_parser.add_argument('--ncpus', action='store', type=int, default=None, help='Total number of CPUs')
   simple_parser.add_argument('--command', action='store', default='vasp', help="The Vasp command to execute (eg. mpirun -np {NCPUS} vasp)")
   simple_parser.add_argument('vaspdir', default=os.getcwd(), action='store', help='location of the VASP input files')
 
   relax_parser = subparsers.add_parser('relax', help='Perform a relaxation run')
-  relax_parser.add_argument('--ncpus', action='store', default=None, help='Total number of CPUs')
+  relax_parser.add_argument('--ncpus', action='store', type=int, default=None, help='Total number of CPUs')
   relax_parser.add_argument('--command', action='store', default='vasp', help="The Vasp command to execute (eg. mpirun -np {NCPUS} vasp)")
   relax_parser.add_argument('vaspdir', default=os.getcwd(), action='store', help='location of the VASP input files')
 
